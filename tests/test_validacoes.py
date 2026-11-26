@@ -1,7 +1,7 @@
 
 import unittest
 from decimal import Decimal
-from datetime import date
+from datetime import date, datetime
 
 from src.validacoes import (
     normalizar_processo,
@@ -114,6 +114,21 @@ class TestValidacoes(unittest.TestCase):
         resultado = identificar_correcoes(original, normalizado)
 
         self.assertEqual(resultado, [])
+
+
+    def test_validar_data_com_fuso_horario(self):
+        resultado = validar_data("2025-04-02T23:30:00-03:00")
+
+        self.assertIsInstance(resultado, datetime)
+        self.assertEqual(resultado.date(), date(2025, 4, 2))
+        self.assertIsNotNone(resultado.tzinfo)
+
+    def test_calcular_prazo_com_timestamp_e_fuso(self):
+        data_apresentacao = validar_data("2025-04-02T23:30:00-03:00")
+
+        resultado = calcular_prazo(data_apresentacao)
+
+        self.assertEqual(resultado, date(2026, 12, 31))
 
 
 if __name__ == "__main__":

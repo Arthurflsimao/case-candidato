@@ -20,7 +20,7 @@ O evento `ev-001` também aparece duas vezes, mas com valores diferentes: R$ 15.
 
 **Impacto:** a reimportação de eventos pode contabilizar pagamentos mais de uma vez. No caso de `ev-001`, considerar os dois registros como eventos independentes resultaria em duplicidade; considerar apenas um deles sem uma regra de atualização também pode produzir um valor incorreto.
 
-**Relação causal:** o cenário descreve que o operador pode executar novamente o arquivo após uma falha na importação. A ausência de uma restrição de unicidade no banco original aumentaria o risco de duplicidade. O comportamento efetivo do importador não pode ser confirmado, pois seu código não foi fornecido.
+**Relação causal:** o cenário descreve que o operador pode executar novamente o arquivo após uma falha na importação. O `schema.sql` apresentado já prevê uma restrição de unicidade por origem e identificador do evento. Entretanto, não foram fornecidos o código do importador nem evidências de que essa restrição esteja efetivamente implantada na base utilizada pela operação. Portanto, permanece o risco de duplicidade caso a importação não implemente mecanismos de idempotência.
 
 **Tratamento proposto:** deduplicar registros idênticos e encaminhar eventos com o mesmo identificador e conteúdos diferentes para análise, sem escolher automaticamente um valor. A proposta de banco inclui uma restrição de unicidade por origem e identificador do evento.
 
@@ -62,7 +62,7 @@ O processo `0034567-32.2018.8.26.0405` possui um pagamento de R$ 5.000,00 e um e
 
 **Impacto:** caso o estorno seja somado como um pagamento comum, o total pago será incorreto.
 
-**Relação causal:** risco na regra de contabilização. O esquema do banco permite os tipos `pagamento` e `estorno`, mas não define como o saldo deve ser calculado nem como o estorno deve ser relacionado ao pagamento original.
+**Relação causal:** risco na regra de contabilização e possível incompatibilidade entre o leiaute documentado e os dados recebidos. A documentação do tribunal descreve o campo `tipo` como sempre `"pagamento"`, enquanto o arquivo recebido contém um evento identificado como `"estorno"`. O esquema do banco permite ambos os tipos, mas não define como o saldo deve ser calculado nem como o estorno deve ser relacionado ao pagamento original.
 
 **Tratamento proposto:** definir explicitamente que pagamentos aumentam o total e estornos o reduzem, mantendo os valores armazenados como positivos e utilizando o tipo para determinar o efeito financeiro. Solicitar ao tribunal um identificador que permita relacionar o estorno ao pagamento original.
 
