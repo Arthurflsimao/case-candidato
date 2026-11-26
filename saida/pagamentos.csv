@@ -1,0 +1,14 @@
+﻿status;evento_id;processo;valor;tipo;data_pagamento;motivo
+valido;ev-002;00123451020198260053;2500.50;pagamento;2025-04-10;
+valido;ev-003;00234562120208260053;8000.00;pagamento;2025-05-02;
+valido;ev-005;00234562120208260053;1200.00;pagamento;2025-06-01;
+valido;ev-006;00345673220188260405;5000.00;pagamento;2025-02-20;
+valido;ev-007;00345673220188260405;5000.00;estorno;2025-02-21;
+valido;ev-008;00456784320215020011;3000.00;pagamento;2025-07-15;
+valido;ev-011;00678906520168260053;4000.00;pagamento;2025-08-10;
+duplicado;ev-002;;;;;Evento duplicado com conteúdo idêntico.
+pendente;ev-001;00123451020198260053;15000.00;pagamento;2025-03-10;Mesmo identificador encontrado com conteúdo diferente.
+pendente;ev-001;00123451020198260053;15500.00;pagamento;2025-03-10;Mesmo identificador encontrado com conteúdo diferente.
+descartado;ev-004;00234562120208260053;;pagamento;2025-05-03;Valor monetário não informado.
+descartado;ev-009;00567895420174036100;-200;pagamento;2025-07-20;O valor do evento deve ser positivo.
+descartado;ev-010;;750;pagamento;2025-08-01;Número CNJ inválido: esperado 20 dígitos, encontrado 0.

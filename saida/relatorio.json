@@ -1,0 +1,137 @@
+{
+    "resumo_pagamentos": {
+        "validos": 7,
+        "duplicados": 1,
+        "pendentes": 1,
+        "registros_em_conflito": 2,
+        "descartados": 3
+    },
+    "saldos": [
+        {
+            "processo": "00123451020198260053",
+            "saldo": "2500.50"
+        },
+        {
+            "processo": "00234562120208260053",
+            "saldo": "9200.00"
+        },
+        {
+            "processo": "00345673220188260405",
+            "saldo": "0.00"
+        },
+        {
+            "processo": "00456784320215020011",
+            "saldo": "3000.00"
+        },
+        {
+            "processo": "00678906520168260053",
+            "saldo": "4000.00"
+        }
+    ],
+    "comparacao_processos": {
+        "presentes_nos_dois": [
+            "00123451020198260053",
+            "00234562120208260053",
+            "00345673220188260405",
+            "00456784320215020011"
+        ],
+        "somente_hub": [
+            "00567895420174036100"
+        ],
+        "somente_tribunal": [
+            "00678906520168260053"
+        ]
+    },
+    "conciliacao": [
+        {
+            "processo": "00123451020198260053",
+            "valor_hub": "45000.00",
+            "valor_tribunal": "45000.00",
+            "diferenca_valor": "0.00",
+            "valores_iguais": true,
+            "ente_hub": "MUNICIPIO DE SAO PAULO",
+            "ente_tribunal": "Município de São Paulo",
+            "entes_iguais": true
+        },
+        {
+            "processo": "00234562120208260053",
+            "valor_hub": "31000.00",
+            "valor_tribunal": "30000.00",
+            "diferenca_valor": "-1000.00",
+            "valores_iguais": false,
+            "ente_hub": "Município de São Paulo",
+            "ente_tribunal": "Município de São Paulo",
+            "entes_iguais": true
+        },
+        {
+            "processo": "00345673220188260405",
+            "valor_hub": "12500.00",
+            "valor_tribunal": "12500.00",
+            "diferenca_valor": "0.00",
+            "valores_iguais": true,
+            "ente_hub": "Estado de São Paulo",
+            "ente_tribunal": "Estado de São Paulo",
+            "entes_iguais": true
+        },
+        {
+            "processo": "00456784320215020011",
+            "valor_hub": "9800.00",
+            "valor_tribunal": "9800.00",
+            "diferenca_valor": "0.00",
+            "valores_iguais": true,
+            "ente_hub": "Município de Santos",
+            "ente_tribunal": "União",
+            "entes_iguais": false
+        }
+    ],
+    "prazos": [
+        {
+            "processo": "00123451020198260053",
+            "data_apresentacao": "2025-04-02",
+            "prazo_hub": "2027-12-31",
+            "prazo_calculado": "2026-12-31",
+            "situacao": "Divergente",
+            "motivo": "Prazo registrado no Hub diferente do prazo calculado."
+        },
+        {
+            "processo": "00234562120208260053",
+            "data_apresentacao": "2025-04-03",
+            "prazo_hub": "2027-12-31",
+            "prazo_calculado": "2027-12-31",
+            "situacao": "Conferido",
+            "motivo": null
+        },
+        {
+            "processo": "00345673220188260405",
+            "data_apresentacao": "2024-02-29",
+            "prazo_hub": "2025-12-31",
+            "prazo_calculado": "2025-12-31",
+            "situacao": "Conferido",
+            "motivo": null
+        },
+        {
+            "processo": "00456784320215020011",
+            "data_apresentacao": "2025-04-02T23:30:00-03:00",
+            "prazo_hub": "2026-12-31",
+            "prazo_calculado": "2026-12-31",
+            "situacao": "Pendente",
+            "motivo": "Aguardando confirmação do fuso horário pelo tribunal."
+        },
+        {
+            "processo": "00567895420174036100",
+            "data_apresentacao": "2025-04-03T01:00:00+00:00",
+            "prazo_hub": "2027-12-31",
+            "prazo_calculado": "2027-12-31",
+            "situacao": "Pendente",
+            "motivo": "Aguardando confirmação do fuso horário pelo tribunal."
+        },
+        {
+            "processo": "00678906520168260053",
+            "data_apresentacao": null,
+            "prazo_hub": null,
+            "prazo_calculado": null,
+            "situacao": "Pendente",
+            "motivo": "Processo não encontrado no Hub."
+        }
+    ]
+}

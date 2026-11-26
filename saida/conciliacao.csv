@@ -1,0 +1,5 @@
+﻿processo;valor_hub;valor_tribunal;diferenca_valor;valores_iguais;ente_hub;ente_tribunal;entes_iguais
+00123451020198260053;45000.00;45000.00;0.00;True;MUNICIPIO DE SAO PAULO;Município de São Paulo;True
+00234562120208260053;31000.00;30000.00;-1000.00;False;Município de São Paulo;Município de São Paulo;True
+00345673220188260405;12500.00;12500.00;0.00;True;Estado de São Paulo;Estado de São Paulo;True
+00456784320215020011;9800.00;9800.00;0.00;True;Município de Santos;União;False

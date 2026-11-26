@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+
+# Ambientes virtuais
+.venv/
+venv/
+
+# Configurações e segredos
+.env
+
+# Testes e caches
+.pytest_cache/
+
+# Arquivos temporários
+saida/teste.csv
+saida/teste.json
