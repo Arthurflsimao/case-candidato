@@ -20,9 +20,9 @@ O evento `ev-001` também aparece duas vezes, mas com valores diferentes: R$ 15.
 
 **Impacto:** a reimportação de eventos pode contabilizar pagamentos mais de uma vez. No caso de `ev-001`, considerar os dois registros como eventos independentes resultaria em duplicidade; considerar apenas um deles sem uma regra de atualização também pode produzir um valor incorreto.
 
-**Relação causal:** o cenário descreve que o operador pode executar novamente o arquivo após uma falha na importação. A ausência de uma restrição de unicidade para `evento_id` no banco aumenta o risco de duplicidade. O comportamento efetivo do importador não pode ser confirmado, pois seu código não foi fornecido.
+**Relação causal:** o cenário descreve que o operador pode executar novamente o arquivo após uma falha na importação. A ausência de uma restrição de unicidade no banco original aumentaria o risco de duplicidade. O comportamento efetivo do importador não pode ser confirmado, pois seu código não foi fornecido.
 
-**Tratamento proposto:** deduplicar registros idênticos e encaminhar eventos com o mesmo identificador e conteúdos diferentes para análise, sem escolher automaticamente um valor.
+**Tratamento proposto:** deduplicar registros idênticos e encaminhar eventos com o mesmo identificador e conteúdos diferentes para análise, sem escolher automaticamente um valor. A proposta de banco inclui uma restrição de unicidade por origem e identificador do evento.
 
 ### 2.2. Formato de valor incompatível com a documentação
 
@@ -38,21 +38,7 @@ O campo `valor` aparece como texto no formato `"2.500,50"`, enquanto `DOCUMENTAC
 
 **Tratamento proposto:** aceitar formatos conhecidos e explicitamente identificados, convertendo-os para valores decimais com duas casas. Formatos ambíguos devem ser colocados em análise.
 
-### 2.3. Formato de data incompatível com a documentação
-
-**Gravidade:** Média
-
-**Evidência:** `dados/pagamentos.json`, evento `ev-002`.
-
-A data de pagamento está no formato `10/04/2025`, enquanto a documentação especifica `AAAA-MM-DD`.
-
-**Impacto:** um importador que espere exclusivamente o formato documentado pode rejeitar o registro ou interpretar incorretamente a data.
-
-**Relação causal:** divergência entre o formato recebido e o contrato documentado.
-
-**Tratamento proposto:** normalizar formatos reconhecidos e rejeitar datas inválidas ou ambíguas.
-
-### 2.4. Evento com valor ausente
+### 2.3. Evento com valor ausente
 
 **Gravidade:** Alta
 
@@ -66,21 +52,7 @@ O campo `valor` está preenchido com `null`.
 
 **Tratamento proposto:** separar o evento para análise, sem atribuir valor automaticamente.
 
-### 2.5. Número do processo fora do padrão documentado
-
-**Gravidade:** Média
-
-**Evidência:** `dados/pagamentos.json`, evento `ev-005`.
-
-O processo está registrado como `00234562120208260053`, sem a pontuação do formato CNJ definido na documentação.
-
-**Impacto:** comparações textuais exatas podem impedir a associação do pagamento ao precatório correspondente.
-
-**Relação causal:** falta de padronização dos identificadores, com possível consequência na associação dos registros.
-
-**Tratamento proposto:** validar a quantidade de dígitos e normalizar o processo para uma representação composta por 20 dígitos, preservando o valor original para auditoria.
-
-### 2.6. Estorno exige tratamento específico
+### 2.4. Estorno exige tratamento específico
 
 **Gravidade:** Alta
 
@@ -90,11 +62,11 @@ O processo `0034567-32.2018.8.26.0405` possui um pagamento de R$ 5.000,00 e um e
 
 **Impacto:** caso o estorno seja somado como um pagamento comum, o total pago será incorreto.
 
-**Relação causal:** risco na regra de contabilização. O esquema do banco permite os tipos `pagamento` e `estorno`, mas não define como o saldo deve ser calculado.
+**Relação causal:** risco na regra de contabilização. O esquema do banco permite os tipos `pagamento` e `estorno`, mas não define como o saldo deve ser calculado nem como o estorno deve ser relacionado ao pagamento original.
 
-**Tratamento proposto:** definir explicitamente que pagamentos aumentam o total e estornos o reduzem, mantendo os valores armazenados como positivos e utilizando o tipo para determinar o efeito financeiro.
+**Tratamento proposto:** definir explicitamente que pagamentos aumentam o total e estornos o reduzem, mantendo os valores armazenados como positivos e utilizando o tipo para determinar o efeito financeiro. Solicitar ao tribunal um identificador que permita relacionar o estorno ao pagamento original.
 
-### 2.7. Pagamento com valor negativo
+### 2.5. Pagamento com valor negativo
 
 **Gravidade:** Alta
 
@@ -108,7 +80,7 @@ O evento está identificado como `pagamento`, mas possui valor de -R$ 200,00.
 
 **Tratamento proposto:** colocar o registro em análise. Não convertê-lo automaticamente em estorno, pois isso exigiria confirmação do tribunal.
 
-### 2.8. Evento sem número de processo
+### 2.6. Evento sem número de processo
 
 **Gravidade:** Alta
 
@@ -122,7 +94,7 @@ O campo `processo` está vazio.
 
 **Tratamento proposto:** separar o evento para análise, preservando todos os campos originais.
 
-### 2.9. Divergência no valor de face do precatório
+### 2.7. Divergência no valor de face do precatório
 
 **Gravidade:** Alta
 
@@ -136,7 +108,7 @@ O tribunal informa valor de face de R$ 30.000,00, enquanto o Hub registra R$ 31.
 
 **Tratamento proposto:** apresentar a divergência em relatório e solicitar confirmação antes de atualizar o cadastro automaticamente.
 
-### 2.10. Processo presente somente no Hub
+### 2.8. Processo presente somente no Hub
 
 **Gravidade:** Alta
 
@@ -152,7 +124,7 @@ O processo também possui o evento `ev-009`, que apresenta valor negativo.
 
 **Tratamento proposto:** encaminhar para conferência com o tribunal e a operação.
 
-### 2.11. Processo presente somente no tribunal
+### 2.9. Processo presente somente no Tribunal
 
 **Gravidade:** Alta
 
@@ -166,7 +138,7 @@ O tribunal informa valor de face de R$ 7.000,00, mas o processo não consta na e
 
 **Tratamento proposto:** verificar a existência do precatório e sua ausência no Hub antes de importar ou contabilizar o pagamento.
 
-### 2.12. Divergência no ente devedor
+### 2.10. Divergência no ente devedor
 
 **Gravidade:** Alta
 
@@ -180,7 +152,7 @@ O tribunal informa o ente devedor como União, enquanto o Hub registra Municípi
 
 **Tratamento proposto:** não realizar substituição automática. Solicitar validação do cadastro com base na fonte oficial.
 
-### 2.13. Incompatibilidade entre o leiaute documentado e o CSV recebido
+### 2.11. Incompatibilidade entre o leiaute documentado e o CSV recebido
 
 **Gravidade:** Alta
 
@@ -202,7 +174,7 @@ A codificação foi investigada por meio da leitura dos bytes do arquivo.
 
 **Tratamento proposto:** formalizar o leiaute esperado com o tribunal e implementar validação explícita de delimitador, codificação e formato numérico.
 
-### 2.14. Prazo de pagamento calculado incorretamente
+### 2.12. Prazo de pagamento calculado incorretamente
 
 **Gravidade:** Alta
 
@@ -216,7 +188,7 @@ A data de apresentação é 02/04/2025. Conforme a regra descrita no enunciado, 
 
 **Tratamento proposto:** recalcular os prazos a partir da data de apresentação validada, com testes automatizados para os dias anteriores, iguais e posteriores a 2 de abril.
 
-### 2.15. Ambiguidade de fuso horário nas datas de apresentação
+### 2.13. Ambiguidade de fuso horário nas datas de apresentação
 
 **Gravidade:** Alta
 
@@ -235,35 +207,7 @@ Esses horários correspondem, respectivamente, a 03/04/2025 às 02:30 UTC e 02/0
 
 **Tratamento proposto:** confirmar com o tribunal qual fuso determina a data juridicamente válida e aplicar a mesma regra em todo o sistema.
 
-### 2.16. Tamanho incompatível da coluna de número do processo
-
-**Gravidade:** Média
-
-**Evidência:** `schema.sql`, coluna `precatorio.numero_processo`.
-
-A coluna foi definida como `VARCHAR(20)`, mas o número CNJ pontuado possui 25 caracteres. O mesmo número contém 20 dígitos quando removidos os separadores.
-
-**Impacto:** armazenar diretamente o formato pontuado pode causar falha de inserção ou incompatibilidade com o tamanho da coluna.
-
-**Relação causal:** limitação de modelagem do banco relacionada à ausência de uma estratégia explícita de padronização do identificador.
-
-**Tratamento proposto:** adotar uma representação única. Uma alternativa é utilizar `VARCHAR(25)` e armazenar o número no formato CNJ pontuado. Caso a opção seja armazenar somente os 20 dígitos, a normalização deve ser aplicada consistentemente em todas as integrações.
-
-### 2.17. Ausência de unicidade para o identificador do evento
-
-**Gravidade:** Alta
-
-**Evidência:** `schema.sql`, tabela `pagamento`, coluna `evento_id`.
-
-O identificador do evento é obrigatório, mas não possui restrição `UNIQUE`.
-
-**Impacto:** o banco não impede a inserção de eventos repetidos, aumentando o risco de contabilização duplicada quando um arquivo é processado novamente.
-
-**Relação causal:** limitação do modelo de dados que contribui para o risco de falta de idempotência na importação.
-
-**Tratamento proposto:** estabelecer uma chave de unicidade para o identificador do evento, considerando também a origem do evento caso existam múltiplos tribunais.
-
-### 2.18. Ausência de tratamento operacional para falhas de importação
+### 2.14. Ausência de tratamento operacional para falhas de importação
 
 **Gravidade:** Alta
 
@@ -278,6 +222,34 @@ Além disso, quando ocorre uma falha no meio da importação, o operador executa
 **Relação causal:** problema de processo operacional e de desenho da integração. A ausência de alertas e de mecanismos de idempotência pode agravar as divergências financeiras.
 
 **Tratamento proposto:** implementar processamento transacional, idempotência, registro de erros, relatório de rejeições e alertas para a operação.
+
+### 2.15. Formato de data incompatível com a documentação
+
+**Gravidade:** Média
+
+**Evidência:** `dados/pagamentos.json`, evento `ev-002`.
+
+A data de pagamento está no formato `10/04/2025`, enquanto a documentação especifica `AAAA-MM-DD`.
+
+**Impacto:** um importador que espere exclusivamente o formato documentado pode rejeitar o registro ou interpretar incorretamente a data.
+
+**Relação causal:** divergência entre o formato recebido e o contrato documentado.
+
+**Tratamento proposto:** normalizar formatos reconhecidos e rejeitar datas inválidas ou ambíguas.
+
+### 2.16. Número do processo fora do padrão documentado
+
+**Gravidade:** Média
+
+**Evidência:** `dados/pagamentos.json`, evento `ev-005`.
+
+O processo está registrado como `00234562120208260053`, sem a pontuação do formato CNJ definido na documentação.
+
+**Impacto:** comparações textuais exatas podem impedir a associação do pagamento ao precatório correspondente.
+
+**Relação causal:** falta de padronização dos identificadores, com possível consequência na associação dos registros.
+
+**Tratamento proposto:** validar a quantidade de dígitos e normalizar o processo para uma representação composta por 20 dígitos, preservando o valor original para auditoria.
 
 ## 3. Limitações da investigação
 
@@ -323,14 +295,16 @@ Os registros com conflitos, como o `ev-001`, devem permanecer pendentes até que
 
 ### 4.3. Melhorias no banco de dados
 
-Proponho as seguintes alterações e controles:
+O esquema proposto em `schema.sql` já contempla algumas proteções importantes, como a unicidade do número de processo, a validação de seu formato normalizado e a restrição de unicidade composta por origem e identificador do evento.
 
-- Definir uma representação única para o número do processo, utilizando os 20 dígitos normalizados ou o formato CNJ completo, de maneira consistente.
-- Garantir a unicidade do identificador do evento de pagamento. Caso existam diferentes tribunais como origem, considerar uma chave composta pela origem e pelo identificador.
+Além dessas proteções, proponho:
+
+- Manter uma representação única para o número do processo, utilizando os 20 dígitos normalizados de maneira consistente em todas as integrações.
+- Manter a restrição de unicidade para a combinação entre origem e identificador do evento, impedindo que a mesma origem registre o mesmo evento mais de uma vez.
 - Manter os valores de pagamento e estorno positivos no armazenamento, utilizando o campo `tipo` para determinar o efeito de cada lançamento no saldo.
 - Registrar a origem do arquivo e informações de auditoria da importação.
 - Utilizar transações para garantir que uma falha não deixe uma importação parcialmente gravada.
-- Antes de criar restrições de unicidade, identificar e resolver os registros duplicados já existentes.
+- Antes de aplicar restrições adicionais em uma base existente, identificar e resolver eventuais registros duplicados.
 
 A importação deve ser idempotente: o mesmo evento não pode produzir mais de um lançamento, mesmo que o arquivo seja processado novamente.
 
