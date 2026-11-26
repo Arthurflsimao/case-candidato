@@ -9,7 +9,8 @@ from src.validacoes import (
     normalizar_processo,
     converter_valor,
     validar_data,
-    calcular_prazo
+    calcular_prazo,
+    identificar_correcoes
 )
 
 
@@ -77,6 +78,12 @@ def processar_pagamentos(caminho):
     for registro in registros:
         try:
             pagamento = validar_pagamento(registro)
+
+            pagamento["correcoes"] = identificar_correcoes(
+                registro,
+                pagamento
+            )
+
             validacoes_aprovadas.append(pagamento)
 
         except (ValueError, TypeError) as erro:
@@ -185,43 +192,84 @@ def normalizar_texto(texto):
 
 def conciliar_dados(hub, tribunal):
     """
-    Compara valores e entes devedores dos processos
-    presentes nas duas fontes.
+    Compara os dados do Hub e do Tribunal.
+
+    Registra também processos encontrados em apenas
+    uma das fontes.
     """
     conciliacao = []
 
-    processos_comuns = set(hub.keys()) & set(tribunal.keys())
+    todos_processos = set(hub.keys()) | set(tribunal.keys())
 
-    for processo in sorted(processos_comuns):
-        registro_hub = hub[processo]
-        registro_tribunal = tribunal[processo]
+    for processo in sorted(todos_processos):
+        registro_hub = hub.get(processo)
+        registro_tribunal = tribunal.get(processo)
 
-        valor_hub = converter_valor(
-            registro_hub["valor_face"]
-        )
+        # Processo presente nas duas fontes.
+        if registro_hub and registro_tribunal:
+            valor_hub = converter_valor(
+                registro_hub["valor_face"]
+            )
 
-        valor_tribunal = converter_valor(
-            registro_tribunal["valor_face"]
-        )
+            valor_tribunal = converter_valor(
+                registro_tribunal["valor_face"]
+            )
 
-        ente_hub = normalizar_texto(
-            registro_hub["ente"]
-        )
+            ente_hub = normalizar_texto(
+                registro_hub["ente"]
+            )
 
-        ente_tribunal = normalizar_texto(
-            registro_tribunal["ente_devedor"]
-        )
+            ente_tribunal = normalizar_texto(
+                registro_tribunal["ente_devedor"]
+            )
 
-        conciliacao.append({
-            "processo": processo,
-            "valor_hub": valor_hub,
-            "valor_tribunal": valor_tribunal,
-            "valores_iguais": valor_hub == valor_tribunal,
-            "diferenca_valor": valor_tribunal - valor_hub,
-            "ente_hub": registro_hub["ente"],
-            "ente_tribunal": registro_tribunal["ente_devedor"],
-            "entes_iguais": ente_hub == ente_tribunal
-        })
+            conciliacao.append({
+                "processo": processo,
+                "situacao": (
+                    "conciliado"
+                    if valor_hub == valor_tribunal and ente_hub == ente_tribunal
+                    else "divergente"
+                ),
+                "valor_hub": valor_hub,
+                "valor_tribunal": valor_tribunal,
+                "valores_iguais": valor_hub == valor_tribunal,
+                "diferenca_valor": valor_tribunal - valor_hub,
+                "ente_hub": registro_hub["ente"],
+                "ente_tribunal": registro_tribunal["ente_devedor"],
+                "entes_iguais": ente_hub == ente_tribunal
+            })
+
+        # Processo encontrado somente no Hub.
+        elif registro_hub:
+            conciliacao.append({
+                "processo": processo,
+                "situacao": "somente_hub",
+                "valor_hub": converter_valor(
+                    registro_hub["valor_face"]
+                ),
+                "valor_tribunal": None,
+                "valores_iguais": None,
+                "diferenca_valor": None,
+                "ente_hub": registro_hub["ente"],
+                "ente_tribunal": None,
+                "entes_iguais": None
+            })
+
+        # Processo encontrado somente no Tribunal.
+        else:
+            conciliacao.append({
+                "processo": processo,
+                "situacao": "somente_tribunal",
+                "valor_hub": None,
+                "valor_tribunal": converter_valor(
+                    registro_tribunal["valor_face"]
+                ),
+                "valores_iguais": None,
+                "diferenca_valor": None,
+                "ente_hub": None,
+                "ente_tribunal": registro_tribunal["ente_devedor"],
+                "entes_iguais": None
+            })
 
     return conciliacao
 

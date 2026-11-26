@@ -99,6 +99,7 @@ class TestProcessamento(unittest.TestCase):
         resultado = conciliar_dados(hub, tribunal)
 
         self.assertEqual(len(resultado), 1)
+        self.assertEqual(resultado[0]["situacao"], "divergente")
         self.assertFalse(resultado[0]["valores_iguais"])
 
         self.assertEqual(
@@ -107,6 +108,78 @@ class TestProcessamento(unittest.TestCase):
         )
 
         self.assertTrue(resultado[0]["entes_iguais"])
+
+    def test_conciliar_diferenca_de_ente(self):
+        processo = "00123451020198260053"
+
+        hub = {
+            processo: {
+                "numero_processo": processo,
+                "ente": "Município de Santos",
+                "valor_face": "9.800,00"
+            }
+        }
+
+        tribunal = {
+            processo: {
+                "numero_processo": processo,
+                "ente_devedor": "União",
+                "valor_face": "9.800,00"
+            }
+        }
+
+        resultado = conciliar_dados(hub, tribunal)
+
+        self.assertEqual(len(resultado), 1)
+        self.assertEqual(resultado[0]["situacao"], "divergente")
+        self.assertTrue(resultado[0]["valores_iguais"])
+        self.assertFalse(resultado[0]["entes_iguais"])
+
+    def test_conciliar_processo_somente_no_hub(self):
+        processo = "00123451020198260053"
+
+        hub = {
+            processo: {
+                "numero_processo": processo,
+                "ente": "Município de São Paulo",
+                "valor_face": "31.000,00"
+            }
+        }
+
+        tribunal = {}
+
+        resultado = conciliar_dados(hub, tribunal)
+
+        self.assertEqual(len(resultado), 1)
+        self.assertEqual(resultado[0]["situacao"], "somente_hub")
+        self.assertEqual(
+            resultado[0]["valor_hub"],
+            Decimal("31000.00")
+        )
+        self.assertIsNone(resultado[0]["valor_tribunal"])
+
+    def test_conciliar_processo_somente_no_tribunal(self):
+        processo = "00234562120208260053"
+
+        hub = {}
+
+        tribunal = {
+            processo: {
+                "numero_processo": processo,
+                "ente_devedor": "Município de São Paulo",
+                "valor_face": "30.000,00"
+            }
+        }
+
+        resultado = conciliar_dados(hub, tribunal)
+
+        self.assertEqual(len(resultado), 1)
+        self.assertEqual(resultado[0]["situacao"], "somente_tribunal")
+        self.assertEqual(
+            resultado[0]["valor_tribunal"],
+            Decimal("30000.00")
+        )
+        self.assertIsNone(resultado[0]["valor_hub"])
 
 
 if __name__ == "__main__":

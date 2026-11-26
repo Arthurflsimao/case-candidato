@@ -176,3 +176,49 @@ def validar_pagamento(pagamento):
     }
 
 
+def identificar_correcoes(original, normalizado):
+    """
+    Identifica diferenças entre o registro original
+    e o registro após a normalização.
+    """
+    correcoes = []
+
+    campos = {
+        "processo": "processo_normalizado",
+        "valor": "valor",
+        "data_pagamento": "data_pagamento"
+    }
+
+    for campo_original, campo_normalizado in campos.items():
+        valor_original = original.get(campo_original)
+        valor_tratado = normalizado.get(campo_normalizado)
+
+        if campo_original == "processo":
+            original_comparavel = str(valor_original).strip()
+            tratado_comparavel = str(valor_tratado).strip()
+
+        elif campo_original == "valor":
+            original_comparavel = converter_valor(valor_original)
+            tratado_comparavel = converter_valor(valor_tratado)
+
+            # Compara também a representação monetária.
+            if original_comparavel == tratado_comparavel:
+                original_comparavel = str(valor_original).strip()
+                tratado_comparavel = str(valor_tratado)
+
+        elif campo_original == "data_pagamento":
+            original_comparavel = str(valor_original).strip()
+
+            if isinstance(valor_tratado, (date, datetime)):
+                tratado_comparavel = valor_tratado.isoformat()
+            else:
+                tratado_comparavel = str(valor_tratado)
+
+        if original_comparavel != tratado_comparavel:
+            correcoes.append({
+                "campo": campo_original,
+                "valor_original": valor_original,
+                "valor_normalizado": valor_tratado
+            })
+
+    return correcoes

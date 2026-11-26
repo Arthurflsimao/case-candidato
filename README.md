@@ -82,6 +82,7 @@ Os resultados são armazenados na pasta `saida/`.
 | Arquivo | Descrição |
 |---|---|
 | `pagamentos.csv` | Pagamentos válidos, duplicados, pendentes e descartados. |
+| `correcoes.csv` | Registro das normalizações realizadas, com os valores originais e normalizados. |
 | `saldos.csv` | Saldo líquido de pagamentos por processo. |
 | `conciliacao.csv` | Comparação entre os dados do Hub e do Tribunal. |
 | `prazos.csv` | Conferência dos prazos de pagamento. |
@@ -138,11 +139,13 @@ A suíte contempla testes de:
 - Cálculo de saldos com estornos.
 - Conciliação de valores entre Hub e Tribunal.
 
-**Resultado da última execução:** 13 testes aprovados.
+**Resultado da última execução:** 18 testes aprovados.
 
 ## 9. Tratamento de inconsistências
 
 O sistema diferencia registros válidos, duplicados, pendentes e descartados.
+
+As normalizações realizadas durante o processamento são registradas separadamente em `correcoes.csv`, permitindo consultar o valor original e o valor normalizado de cada campo alterado.
 
 As inconsistências identificadas não são corrigidas silenciosamente. Casos que exigem confirmação ou análise operacional são preservados para investigação.
 

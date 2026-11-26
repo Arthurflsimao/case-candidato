@@ -168,6 +168,25 @@ def gerar_relatorio_pagamentos(pagamentos):
     return registros
 
 
+def gerar_relatorio_correcoes(pagamentos):
+    """
+    Reúne as alterações realizadas nos pagamentos
+    durante o processo de normalização.
+    """
+    registros = []
+
+    for pagamento in pagamentos["validos"]:
+        for correcao in pagamento.get("correcoes", []):
+            registros.append({
+                "evento_id": pagamento.get("evento_id"),
+                "campo": correcao.get("campo"),
+                "valor_original": correcao.get("valor_original"),
+                "valor_normalizado": correcao.get("valor_normalizado")
+            })
+
+    return registros
+
+
 def gerar_relatorio_saldos(saldos):
     """
     Converte os saldos agrupados por processo
@@ -196,6 +215,7 @@ def gerar_relatorio_conciliacao(conciliacao):
     for item in conciliacao:
         registros.append({
             "processo": item.get("processo"),
+            "situacao": item.get("situacao"),
             "valor_hub": item.get("valor_hub"),
             "valor_tribunal": item.get("valor_tribunal"),
             "diferenca_valor": item.get("diferenca_valor"),
@@ -250,7 +270,15 @@ def gerar_relatorios(resultado, diretorio_saida="saida"):
         diretorio_saida / "pagamentos.csv"
     )
 
-    # 2. Relatório de saldos.
+    # 2. Relatório de correções.
+    registros_correcoes = gerar_relatorio_correcoes(pagamentos)
+
+    salvar_csv(
+        registros_correcoes,
+        diretorio_saida / "correcoes.csv"
+    )
+
+    # 3. Relatório de saldos.
     registros_saldos = gerar_relatorio_saldos(saldos)
 
     salvar_csv(
@@ -258,7 +286,7 @@ def gerar_relatorios(resultado, diretorio_saida="saida"):
         diretorio_saida / "saldos.csv"
     )
 
-    # 3. Relatório de conciliação.
+    # 4. Relatório de conciliação.
     registros_conciliacao = gerar_relatorio_conciliacao(conciliacao)
 
     salvar_csv(
@@ -266,7 +294,7 @@ def gerar_relatorios(resultado, diretorio_saida="saida"):
         diretorio_saida / "conciliacao.csv"
     )
 
-    # 4. Relatório de prazos.
+    # 5. Relatório de prazos.
     registros_prazos = gerar_relatorio_prazos(prazos)
 
     salvar_csv(
@@ -274,7 +302,7 @@ def gerar_relatorios(resultado, diretorio_saida="saida"):
         diretorio_saida / "prazos.csv"
     )
 
-    # 5. Relatório geral em JSON.
+    # 6. Relatório geral em JSON.
     relatorio = {
         "resumo_pagamentos": {
             "validos": len(pagamentos["validos"]),
@@ -305,6 +333,7 @@ def gerar_relatorios(resultado, diretorio_saida="saida"):
         "diretorio": str(diretorio_saida),
         "arquivos": [
             "pagamentos.csv",
+            "correcoes.csv",
             "saldos.csv",
             "conciliacao.csv",
             "prazos.csv",

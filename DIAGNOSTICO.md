@@ -10,7 +10,8 @@ A análise considera os arquivos originais fornecidos no case. Nenhum arquivo de
 
 ### 2.1. Duplicidade de eventos de pagamento
 
-**Gravidade:** Alta  
+**Gravidade:** Alta
+
 **Evidência:** `dados/pagamentos.json`, eventos `ev-001` e `ev-002`.
 
 O evento `ev-002` aparece duas vezes com exatamente os mesmos dados, incluindo identificador, processo, valor e datas.
@@ -25,7 +26,8 @@ O evento `ev-001` também aparece duas vezes, mas com valores diferentes: R$ 15.
 
 ### 2.2. Formato de valor incompatível com a documentação
 
-**Gravidade:** Alta  
+**Gravidade:** Alta
+
 **Evidência:** `dados/pagamentos.json`, evento `ev-002`.
 
 O campo `valor` aparece como texto no formato `"2.500,50"`, enquanto `DOCUMENTACAO_TRIBUNAL.md` define esse campo como numérico, com ponto como separador decimal.
@@ -38,7 +40,8 @@ O campo `valor` aparece como texto no formato `"2.500,50"`, enquanto `DOCUMENTAC
 
 ### 2.3. Formato de data incompatível com a documentação
 
-**Gravidade:** Média  
+**Gravidade:** Média
+
 **Evidência:** `dados/pagamentos.json`, evento `ev-002`.
 
 A data de pagamento está no formato `10/04/2025`, enquanto a documentação especifica `AAAA-MM-DD`.
@@ -51,7 +54,8 @@ A data de pagamento está no formato `10/04/2025`, enquanto a documentação esp
 
 ### 2.4. Evento com valor ausente
 
-**Gravidade:** Alta  
+**Gravidade:** Alta
+
 **Evidência:** `dados/pagamentos.json`, evento `ev-004`.
 
 O campo `valor` está preenchido com `null`.
@@ -64,7 +68,8 @@ O campo `valor` está preenchido com `null`.
 
 ### 2.5. Número do processo fora do padrão documentado
 
-**Gravidade:** Média  
+**Gravidade:** Média
+
 **Evidência:** `dados/pagamentos.json`, evento `ev-005`.
 
 O processo está registrado como `00234562120208260053`, sem a pontuação do formato CNJ definido na documentação.
@@ -73,11 +78,12 @@ O processo está registrado como `00234562120208260053`, sem a pontuação do fo
 
 **Relação causal:** falta de padronização dos identificadores, com possível consequência na associação dos registros.
 
-**Tratamento proposto:** validar a quantidade de dígitos e normalizar para o formato CNJ padronizado, preservando o valor original para auditoria.
+**Tratamento proposto:** validar a quantidade de dígitos e normalizar o processo para uma representação composta por 20 dígitos, preservando o valor original para auditoria.
 
 ### 2.6. Estorno exige tratamento específico
 
-**Gravidade:** Alta  
+**Gravidade:** Alta
+
 **Evidência:** `dados/pagamentos.json`, eventos `ev-006` e `ev-007`.
 
 O processo `0034567-32.2018.8.26.0405` possui um pagamento de R$ 5.000,00 e um estorno de R$ 5.000,00.
@@ -90,7 +96,8 @@ O processo `0034567-32.2018.8.26.0405` possui um pagamento de R$ 5.000,00 e um e
 
 ### 2.7. Pagamento com valor negativo
 
-**Gravidade:** Alta  
+**Gravidade:** Alta
+
 **Evidência:** `dados/pagamentos.json`, evento `ev-009`.
 
 O evento está identificado como `pagamento`, mas possui valor de -R$ 200,00.
@@ -103,7 +110,8 @@ O evento está identificado como `pagamento`, mas possui valor de -R$ 200,00.
 
 ### 2.8. Evento sem número de processo
 
-**Gravidade:** Alta  
+**Gravidade:** Alta
+
 **Evidência:** `dados/pagamentos.json`, evento `ev-010`.
 
 O campo `processo` está vazio.
@@ -116,7 +124,8 @@ O campo `processo` está vazio.
 
 ### 2.9. Divergência no valor de face do precatório
 
-**Gravidade:** Alta  
+**Gravidade:** Alta
+
 **Evidência:** `dados/tribunal.csv` e `dados/hub.csv`, processo `0023456-21.2020.8.26.0053`.
 
 O tribunal informa valor de face de R$ 30.000,00, enquanto o Hub registra R$ 31.000,00.
@@ -129,7 +138,8 @@ O tribunal informa valor de face de R$ 30.000,00, enquanto o Hub registra R$ 31.
 
 ### 2.10. Processo presente somente no Hub
 
-**Gravidade:** Alta  
+**Gravidade:** Alta
+
 **Evidência:** `dados/hub.csv`, processo `0056789-54.2017.4.03.6100`, ausente de `dados/tribunal.csv`.
 
 O Hub possui um precatório com valor de face de R$ 22.000,00 que não aparece na relação recebida do tribunal.
@@ -144,7 +154,8 @@ O processo também possui o evento `ev-009`, que apresenta valor negativo.
 
 ### 2.11. Processo presente somente no tribunal
 
-**Gravidade:** Alta  
+**Gravidade:** Alta
+
 **Evidência:** `dados/tribunal.csv`, processo `0067890-65.2016.8.26.0053`, ausente de `dados/hub.csv`.
 
 O tribunal informa valor de face de R$ 7.000,00, mas o processo não consta na exportação do Hub. Entretanto, existe um pagamento de R$ 4.000,00 associado a ele no evento `ev-011`.
@@ -157,7 +168,8 @@ O tribunal informa valor de face de R$ 7.000,00, mas o processo não consta na e
 
 ### 2.12. Divergência no ente devedor
 
-**Gravidade:** Alta  
+**Gravidade:** Alta
+
 **Evidência:** `dados/tribunal.csv` e `dados/hub.csv`, processo `0045678-43.2021.5.02.0011`.
 
 O tribunal informa o ente devedor como União, enquanto o Hub registra Município de Santos. Os valores de face são iguais: R$ 9.800,00.
@@ -170,12 +182,14 @@ O tribunal informa o ente devedor como União, enquanto o Hub registra Municípi
 
 ### 2.13. Incompatibilidade entre o leiaute documentado e o CSV recebido
 
-**Gravidade:** Alta  
+**Gravidade:** Alta
+
 **Evidência:** `DOCUMENTACAO_TRIBUNAL.md` e `dados/tribunal.csv`.
 
 A documentação especifica um arquivo UTF-8, separado por vírgulas e com valores numéricos utilizando ponto como separador decimal.
 
 O arquivo recebido apresenta:
+
 - Ponto e vírgula como delimitador.
 - Valores no formato brasileiro, como `45.000,00`.
 - Caracteres acentuados representados por bytes compatíveis com Windows-1252.
@@ -190,7 +204,8 @@ A codificação foi investigada por meio da leitura dos bytes do arquivo.
 
 ### 2.14. Prazo de pagamento calculado incorretamente
 
-**Gravidade:** Alta  
+**Gravidade:** Alta
+
 **Evidência:** `dados/apresentacoes.json` e `dados/hub.csv`, processo `0012345-10.2019.8.26.0053`.
 
 A data de apresentação é 02/04/2025. Conforme a regra descrita no enunciado, o prazo esperado é 31/12/2026. Entretanto, o Hub registra 31/12/2027.
@@ -203,7 +218,8 @@ A data de apresentação é 02/04/2025. Conforme a regra descrita no enunciado, 
 
 ### 2.15. Ambiguidade de fuso horário nas datas de apresentação
 
-**Gravidade:** Alta  
+**Gravidade:** Alta
+
 **Evidência:** `dados/apresentacoes.json`, processos `0045678-43.2021.5.02.0011` e `0056789-54.2017.4.03.6100`.
 
 Os registros apresentam datas com horário e indicação de fuso:
@@ -221,10 +237,11 @@ Esses horários correspondem, respectivamente, a 03/04/2025 às 02:30 UTC e 02/0
 
 ### 2.16. Tamanho incompatível da coluna de número do processo
 
-**Gravidade:** Média  
+**Gravidade:** Média
+
 **Evidência:** `schema.sql`, coluna `precatorio.numero_processo`.
 
-A coluna foi definida como `CHAR(20)`, mas o número CNJ pontuado possui 25 caracteres. O mesmo número contém 20 dígitos quando removidos os separadores.
+A coluna foi definida como `VARCHAR(20)`, mas o número CNJ pontuado possui 25 caracteres. O mesmo número contém 20 dígitos quando removidos os separadores.
 
 **Impacto:** armazenar diretamente o formato pontuado pode causar falha de inserção ou incompatibilidade com o tamanho da coluna.
 
@@ -234,7 +251,8 @@ A coluna foi definida como `CHAR(20)`, mas o número CNJ pontuado possui 25 cara
 
 ### 2.17. Ausência de unicidade para o identificador do evento
 
-**Gravidade:** Alta  
+**Gravidade:** Alta
+
 **Evidência:** `schema.sql`, tabela `pagamento`, coluna `evento_id`.
 
 O identificador do evento é obrigatório, mas não possui restrição `UNIQUE`.
@@ -247,7 +265,8 @@ O identificador do evento é obrigatório, mas não possui restrição `UNIQUE`.
 
 ### 2.18. Ausência de tratamento operacional para falhas de importação
 
-**Gravidade:** Alta  
+**Gravidade:** Alta
+
 **Evidência:** `ENUNCIADO.md`, seção "O fluxo Operacional".
 
 O processo descrito informa que eventos que não podem ser importados são ignorados e que ninguém é avisado.
@@ -274,13 +293,15 @@ Para reduzir erros durante as importações e conciliações, proponho o seguint
 
 1. Preservar os arquivos originais recebidos do tribunal, sem edição manual.
 2. Executar o programa de validação antes de qualquer gravação na base oficial.
-3. Separar os registros em três categorias:
-   - **Válidos:** podem ser importados.
-   - **Corrigidos:** possuem inconsistências que podem ser normalizadas por regras conhecidas e documentadas.
-   - **Pendentes de análise:** apresentam conflitos ou informações insuficientes e não devem ser importados automaticamente.
-4. Gerar um relatório com a quantidade de registros processados, corrigidos, descartados e pendentes, incluindo os motivos.
-5. Conferir os resultados antes de efetivar a importação.
-6. Manter um histórico das execuções para permitir auditoria e identificação de falhas.
+3. Classificar os registros em quatro categorias:
+   - **Válidos:** registros que passaram pelas validações e podem ser considerados no processamento.
+   - **Duplicados:** registros repetidos com conteúdo idêntico, dos quais apenas uma ocorrência deve ser contabilizada.
+   - **Pendentes:** registros com conflitos ou informações ambíguas que exigem confirmação antes de qualquer contabilização.
+   - **Descartados:** registros inválidos que não podem ser importados automaticamente. Devem permanecer registrados nos relatórios para análise operacional.
+4. Identificar e documentar as normalizações realizadas em um relatório específico (`correcoes.csv`), registrando os campos alterados e seus valores originais e normalizados.
+5. Gerar relatórios com a quantidade de registros por categoria, as alterações realizadas e os motivos de rejeição ou pendência.
+6. Conferir os resultados antes de efetivar a importação.
+7. Manter um histórico das execuções para permitir auditoria e identificação de falhas.
 
 A operação deve ser repetível: executar novamente o mesmo arquivo não pode duplicar pagamentos nem alterar indevidamente os valores já registrados.
 

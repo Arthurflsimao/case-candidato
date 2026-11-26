@@ -1,3 +1,4 @@
+
 import unittest
 from decimal import Decimal
 from datetime import date
@@ -7,7 +8,8 @@ from src.validacoes import (
     converter_valor,
     validar_data,
     calcular_prazo,
-    validar_pagamento
+    validar_pagamento,
+    identificar_correcoes
 )
 
 
@@ -60,7 +62,10 @@ class TestValidacoes(unittest.TestCase):
         resultado = validar_pagamento(pagamento)
 
         self.assertEqual(resultado["evento_id"], "teste-001")
-        self.assertEqual(resultado["processo_normalizado"], "00123451020198260053")
+        self.assertEqual(
+            resultado["processo_normalizado"],
+            "00123451020198260053"
+        )
         self.assertEqual(resultado["valor"], Decimal("2500.50"))
 
     def test_validar_pagamento_invalido(self):
@@ -74,6 +79,41 @@ class TestValidacoes(unittest.TestCase):
 
         with self.assertRaises(ValueError):
             validar_pagamento(pagamento)
+
+    def test_identificar_correcoes(self):
+        original = {
+            "evento_id": "teste-003",
+            "processo": "0012345-10.2019.8.26.0053",
+            "valor": "2.500,50",
+            "tipo": "pagamento",
+            "data_pagamento": "10/04/2025"
+        }
+
+        normalizado = validar_pagamento(original)
+
+        resultado = identificar_correcoes(original, normalizado)
+
+        campos = [correcao["campo"] for correcao in resultado]
+
+        self.assertEqual(len(resultado), 3)
+        self.assertIn("processo", campos)
+        self.assertIn("valor", campos)
+        self.assertIn("data_pagamento", campos)
+
+    def test_identificar_correcoes_sem_alteracoes(self):
+        original = {
+            "evento_id": "teste-004",
+            "processo": "00123451020198260053",
+            "valor": "2500.50",
+            "tipo": "pagamento",
+            "data_pagamento": "2025-04-10"
+        }
+
+        normalizado = validar_pagamento(original)
+
+        resultado = identificar_correcoes(original, normalizado)
+
+        self.assertEqual(resultado, [])
 
 
 if __name__ == "__main__":
