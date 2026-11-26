@@ -117,7 +117,7 @@ A regra implementada considera:
 - Apresentações realizadas até 2 de abril, inclusive: pagamento até 31 de dezembro do ano seguinte.
 - Apresentações realizadas após 2 de abril: pagamento até 31 de dezembro do segundo ano seguinte.
 
-Registros com informações de fuso horário ainda não confirmadas são classificados como pendentes.
+Apresentações com timestamps que contenham informações de fuso horário são classificadas como pendentes de confirmação, pois a regra de referência temporal ainda não foi definida
 
 ## 8. Testes automatizados
 
@@ -138,6 +138,8 @@ A suíte contempla testes de:
 - Identificação de duplicidades e conflitos.
 - Cálculo de saldos com estornos.
 - Conciliação de valores entre Hub e Tribunal.
+- Interpretação de timestamps com fuso horário.
+- Classificação de apresentações com fuso horário como pendentes de confirmação.
 
 **Resultado da última execução:** 20 testes aprovados.
 
