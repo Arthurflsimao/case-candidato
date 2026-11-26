@@ -21,7 +21,7 @@ A solução foi implementada em Python e busca reduzir erros operacionais, evita
 
 ## 3. Tecnologias utilizadas
 
-- Python 3.13
+- Python 3.10 ou superior (desenvolvido e testado com Python 3.13).
 - Módulos nativos: `csv`, `json`, `decimal`, `datetime`, `pathlib`, `collections` e `unittest`.
 
 Não são necessárias bibliotecas externas para executar o projeto.
@@ -62,7 +62,7 @@ case-candidato/
 
 ### Pré-requisitos
 
-- Python 3.13 ou superior.
+- Python 3.10 ou superior.
 - Git (opcional, para controle de versão).
 
 ### Executar o processamento
@@ -138,20 +138,38 @@ A suíte contempla testes de:
 - Cálculo de saldos com estornos.
 - Conciliação de valores entre Hub e Tribunal.
 
+**Resultado da última execução:** 13 testes aprovados.
+
 ## 9. Tratamento de inconsistências
 
 O sistema diferencia registros válidos, duplicados, pendentes e descartados.
 
 As inconsistências identificadas não são corrigidas silenciosamente. Casos que exigem confirmação ou análise operacional são preservados para investigação.
 
-## 10. Limitações e pontos de atenção
+## 10. Banco de dados
+
+O arquivo `schema.sql` apresenta uma proposta de estrutura para armazenamento dos precatórios e pagamentos em PostgreSQL.
+
+A proposta contempla restrições de unicidade para identificação de eventos, validação dos números de processo e integridade referencial.
+
+A implementação atual realiza o processamento em arquivos e gera relatórios CSV e JSON. A persistência em banco de dados não faz parte da versão implementada.
+
+## 11. Limitações e pontos de atenção
 
 - A validação do número CNJ verifica a estrutura de 20 dígitos, mas não realiza a validação oficial do dígito verificador.
 - A interpretação de timestamps com fuso horário depende de confirmação da regra adotada pelo Tribunal.
 - Conflitos de identificadores e divergências de conciliação exigem análise antes de qualquer correção definitiva.
 - O formato real dos arquivos deve ser compatível com as configurações de leitura implementadas.
 
-## 11. Próximas melhorias
+## 12. Uso de inteligência artificial
+
+A inteligência artificial foi utilizada como ferramenta de apoio durante o desenvolvimento, principalmente para auxiliar na organização da solução, discussão das regras de negócio, implementação de funcionalidades, elaboração de testes e documentação.
+
+As sugestões foram analisadas e verificadas por meio da leitura do código, execução do programa com os arquivos fornecidos no case, conferência dos relatórios gerados e execução dos testes automatizados.
+
+A ferramenta foi utilizada como apoio ao desenvolvimento, não como substituta da análise das inconsistências ou da validação dos resultados.
+
+## 13. Próximas melhorias
 
 - Persistência dos dados em banco de dados relacional.
 - Implementação de transações para garantir a integridade das importações.
