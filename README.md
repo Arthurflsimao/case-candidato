@@ -139,7 +139,7 @@ A suíte contempla testes de:
 - Cálculo de saldos com estornos.
 - Conciliação de valores entre Hub e Tribunal.
 
-**Resultado da última execução:** 18 testes aprovados.
+**Resultado da última execução:** 20 testes aprovados.
 
 ## 9. Tratamento de inconsistências
 
